@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stress, Technology & Lifestyle Analysis</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 20px;
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 30px;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 2.2em;
+}
+
+.subtitle {
+    text-align: center;
+    color: #7f8c8d;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 20px;
+    background-color: #ecf0f1;
+    border-radius: 8px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.control-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #34495e;
+    font-size: 0.9em;
+}
+
+select, button {
+    padding: 8px 12px;
+    border: 2px solid #bdc3c7;
+    border-radius: 6px;
+    background: white;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+select:hover, button:hover {
+    border-color: #3498db;
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+.chart-container {
+    position: relative;
+}
+
+.tooltip {
+    position: absolute;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    border-radius: 6px;
+    pointer-events: none;
+    font-size: 13px;
+    line-height: 1.4;
+    max-width: 250px;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.axis {
+    font-size: 12px;
+}
+
+.axis-label {
+    font-size: 14px;
+    font-weight: 600;
+    fill: #2c3e50;
+}
+
+.legend {
+    font-size: 13px;
+}
+
+circle {
+    stroke: white;
+    stroke-width: 1;
+}
+
+circle:hover {
+    stroke-width: 2;
+    stroke: #2c3e50;
+}
+
+.insights {
+    margin-top: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+}
+
+.insights h3 {
+    margin-top: 0;
+    font-size: 1.3em;
+}
+
+.insights ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.insights li {
+    margin: 8px 0;
+    padding-left: 20px;
+    position: relative;
+}
+
+.insights li:before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Technology Use, Stress & Lifestyle Patterns</h1>
+<p class="subtitle">Interactive visualization exploring correlations in a dataset of 5,000 individuals</p>
+
+<div class="controls">
+    <div class="control-group">
+        <label for="xAxis">X-Axis:</label>
+        <select id="xAxis">
+            <option value="social_media_hours">Social Media Hours</option>
+            <option value="daily_screen_time_hours">Daily Screen Time</option>
+            <option value="gaming_hours">Gaming Hours</option>
+            <option value="caffeine_intake_mg_per_day">Caffeine Intake (mg)</option>
+            <option value="phone_usage_hours">Phone Usage Hours</option>
+            <option value="sleep_duration_hours">Sleep Duration</option>
+        </select>
+    </div>
+    
+    <div class="control-group">
+        <label for="yAxis">Y-Axis:</label>
+        <select id="yAxis">
+            <option value="stress_level" selected>Stress Level</option>
+            <option value="weekly_anxiety_score">Weekly Anxiety</option>
+            <option value="mood_rating">Mood Rating</option>
+            <option value="mental_health_score">Mental Health Score</option>
+        </select>
+    </div>
+    
+    <div class="control-group">
+        <label for="colorBy">Color By:</label>
+        <select id="colorBy">
+            <option value="gender">Gender</option>
+            <option value="location_type" selected>Location Type</option>
+        </select>
+    </div>
+    
+    <div class="control-group">
+        <label for="sizeBy">Size By:</label>
+        <select id="sizeBy">
+            <option value="caffeine_intake_mg_per_day" selected>Caffeine Intake</option>
+            <option value="age">Age</option>
+            <option value="sleep_duration_hours">Sleep Duration</option>
+        </select>
+    </div>
+    
+    <div class="control-group">
+        <button onclick="resetView()">Reset View</button>
+    </div>
+</div>
+
+<div class="chart-container">
+    <svg id="scatterplot"></svg>
+</div>
+
+
+</div>
+
+<script>
+// Load and visualize the data
+let fullData = [];
+let currentData = [];
+
+const margin = {top: 20, right: 150, bottom: 70, left: 80};
+const width = 1000 - margin.left - margin.right;
+const height = 600 - margin.top - margin.bottom;
+
+const svg = d3.select("#scatterplot")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom);
+    
+const g = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+// Tooltip
+const tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+    
+// Color scales
+const colorScales = {
+    gender: d3.scaleOrdinal()
+        .domain(["Male", "Female", "Other"])
+        .range(["#3498db", "#e74c3c", "#9b59b6"]),
+    location_type: d3.scaleOrdinal()
+        .domain(["Urban", "Suburban", "Rural"])
+        .range(["#e67e22", "#2ecc71", "#1abc9c"])
+};
+
+async function loadData() {
+    try {
+        const csvText = await window.fs.readFile('Tech_Use_Stress_Wellness.csv', { encoding: 'utf8' });
+        const data = d3.csvParse(csvText, d => {
+            // Convert numeric fields
+            const numericFields = [
+                'user_id', 'age', 'daily_screen_time_hours', 'phone_usage_hours',
+                'laptop_usage_hours', 'tablet_usage_hours', 'tv_usage_hours',
+                'social_media_hours', 'work_related_hours', 'entertainment_hours',
+                'gaming_hours', 'sleep_duration_hours', 'sleep_quality', 'mood_rating',
+                'stress_level', 'physical_activity_hours_per_week', 'mental_health_score',
+                'caffeine_intake_mg_per_day', 'weekly_anxiety_score', 'weekly_depression_score',
+                'mindfulness_minutes_per_day'
+            ];
+            
+            numericFields.forEach(field => {
+                d[field] = +d[field];
+            });
+            
+            return d;
+        });
+        
+        fullData = data;
+        currentData = data;
+        updateVisualization();
+        updateCorrelationInfo();
+        console.log("Data loaded successfully:", data.length, "records");
+    } catch (error) {
+        console.error("Error loading data:", error);
+    }
+}
+
+function updateVisualization() {
+    // Clear previous visualization
+    g.selectAll("*").remove();
+    
+    const xVar = document.getElementById("xAxis").value;
+    const yVar = document.getElementById("yAxis").value;
+    const colorVar = document.getElementById("colorBy").value;
+    const sizeVar = document.getElementById("sizeBy").value;
+    
+    // Set up scales
+    const xScale = d3.scaleLinear()
+        .domain(d3.extent(currentData, d => d[xVar]))
+        .range([0, width])
+        .nice();
+        
+    const yScale = d3.scaleLinear()
+        .domain(d3.extent(currentData, d => d[yVar]))
+        .range([height, 0])
+        .nice();
+        
+    const sizeScale = d3.scaleSqrt()
+        .domain(d3.extent(currentData, d => d[sizeVar]))
+        .range([3, 15]);
+    
+    // Add axes
+    g.append("g")
+        .attr("class", "axis")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(xScale));
+        
+    g.append("g")
+        .attr("class", "axis")
+        .call(d3.axisLeft(yScale));
+    
+    // Add axis labels
+    g.append("text")
+        .attr("class", "axis-label")
+        .attr("transform", `translate(${width/2}, ${height + 50})`)
+        .style("text-anchor", "middle")
+        .text(formatLabel(xVar));
+        
+    g.append("text")
+        .attr("class", "axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -50)
+        .attr("x", -height/2)
+        .style("text-anchor", "middle")
+        .text(formatLabel(yVar));
+    
+    // Add circles
+    g.selectAll(".dot")
+        .data(currentData)
+        .enter().append("circle")
+        .attr("class", "dot")
+        .attr("r", d => sizeScale(d[sizeVar]))
+        .attr("cx", d => xScale(d[xVar]))
+        .attr("cy", d => yScale(d[yVar]))
+        .style("fill", d => colorScales[colorVar](d[colorVar]))
+        .style("opacity", 0.7)
+        .on("mouseover", function(event, d) {
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+            tooltip.html(`
+                <strong>${formatLabel(colorVar)}:</strong> ${d[colorVar]}<br/>
+                <strong>${formatLabel(xVar)}:</strong> ${d[xVar].toFixed(1)}<br/>
+                <strong>${formatLabel(yVar)}:</strong> ${d[yVar].toFixed(1)}<br/>
+                <strong>${formatLabel(sizeVar)}:</strong> ${d[sizeVar].toFixed(1)}<br/>
+                <strong>Age:</strong> ${d.age}<br/>
+                <strong>Gender:</strong> ${d.gender}
+            `)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(d) {
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+    
+    // Add legend
+    const legendData = colorScales[colorVar].domain();
+    const legend = g.append("g")
+        .attr("class", "legend")
+        .attr("transform", `translate(${width + 20}, 20)`);
+        
+    legend.selectAll("rect")
+        .data(legendData)
+        .enter().append("rect")
+        .attr("x", 0)
+        .attr("y", (d, i) => i * 25)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", d => colorScales[colorVar](d));
+        
+    legend.selectAll("text")
+        .data(legendData)
+        .enter().append("text")
+        .attr("x", 25)
+        .attr("y", (d, i) => i * 25 + 14)
+        .text(d => d)
+        .style("font-size", "14px");
+}
+
+function formatLabel(variable) {
+    const labels = {
+        'stress_level': 'Stress Level (1-10)',
+        'caffeine_intake_mg_per_day': 'Caffeine Intake (mg/day)',
+        'daily_screen_time_hours': 'Daily Screen Time (hours)',
+        'social_media_hours': 'Social Media (hours/day)',
+        'gaming_hours': 'Gaming (hours/day)',
+        'phone_usage_hours': 'Phone Usage (hours/day)',
+        'sleep_duration_hours': 'Sleep Duration (hours)',
+        'weekly_anxiety_score': 'Weekly Anxiety Score',
+        'mood_rating': 'Mood Rating (1-10)',
+        'mental_health_score': 'Mental Health Score',
+        'age': 'Age (years)',
+        'gender': 'Gender',
+        'location_type': 'Location Type'
+    };
+    return labels[variable] || variable;
+}
+
+
+
+function resetView() {
+    document.getElementById("xAxis").value = "social_media_hours";
+    document.getElementById("yAxis").value = "stress_level";
+    document.getElementById("colorBy").value = "location_type";
+    document.getElementById("sizeBy").value = "caffeine_intake_mg_per_day";
+    updateVisualization();
+}
+
+// Event listeners
+document.getElementById("xAxis").addEventListener("change", updateVisualization);
+document.getElementById("yAxis").addEventListener("change", updateVisualization);
+document.getElementById("colorBy").addEventListener("change", updateVisualization);
+document.getElementById("sizeBy").addEventListener("change", updateVisualization);
+
+// Initialize
+loadData();
+</script>
+</body>
+</html>
