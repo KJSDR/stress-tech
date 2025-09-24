@@ -6,33 +6,12 @@
 <title>Stress, Technology & Lifestyle Analysis</title>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 20px;
-    background-color: #f8f9fa;
-  }
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    padding: 30px;
-  }
-  h1 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 10px;
-    font-size: 2.2em;
-  }
-  .subtitle {
-    text-align: center;
-    color: #7f8c8d;
-    margin-bottom: 30px;
-    font-size: 1.1em;
-  }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; }
+  .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 30px; }
+  h1 { text-align: center; color: #2c3e50; margin-bottom: 10px; font-size: 2.2em; }
+  .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 30px; font-size: 1.1em; }
 
-  /* --- Controls layout --- */
+  /* Controls in neat grid */
   .controls {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -42,81 +21,30 @@
     background-color: #ecf0f1;
     border-radius: 8px;
   }
-  .control-group {
-    display: flex;
-    flex-direction: column;
-  }
-  .control-group label {
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: #34495e;
-    font-size: 0.9em;
-  }
+  .control-group { display: flex; flex-direction: column; }
+  .control-group label { font-weight: 600; margin-bottom: 8px; color: #34495e; font-size: 0.9em; }
   select, button {
-    width: 100%;
-    padding: 10px 12px;
-    border: 2px solid #bdc3c7;
-    border-radius: 6px;
-    background: white;
-    font-size: 14px;
-    transition: all 0.2s ease;
+    width: 100%; padding: 10px 12px; border: 2px solid #bdc3c7; border-radius: 6px; background: white; font-size: 14px; transition: all 0.2s ease;
   }
   select:hover, button:hover { border-color: #3498db; }
-  button {
-    background-color: #3498db;
-    color: white;
-    border-color: #3498db;
-    cursor: pointer;
-    font-weight: 600;
-  }
+  button { background-color: #3498db; color: white; border-color: #3498db; cursor: pointer; font-weight: 600; }
   button:hover { background-color: #2980b9; }
 
   .chart-container { position: relative; overflow-x: auto; }
   .tooltip {
-    position: absolute;
-    padding: 12px;
-    background: rgba(0,0,0,0.9);
-    color: white;
-    border-radius: 6px;
-    pointer-events: none;
-    font-size: 13px;
-    line-height: 1.4;
-    max-width: 260px;
-    z-index: 1000;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    position: absolute; padding: 12px; background: rgba(0,0,0,0.9); color: white; border-radius: 6px; pointer-events: none;
+    font-size: 13px; line-height: 1.4; max-width: 260px; z-index: 1000; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   }
   .axis { font-size: 12px; }
   .axis-label { font-size: 14px; font-weight: 600; fill: #2c3e50; }
-  .legend { font-size: 13px; }
 </style>
 </head>
 <body>
 <div class="container">
   <h1>Technology Use, Stress & Lifestyle Patterns</h1>
-  <p class="subtitle">Bar-focused visualization (distribution & averages)</p>
+  <p class="subtitle">Average values by category</p>
 
   <div class="controls">
-    <div class="control-group">
-      <label for="chartType">Chart Type:</label>
-      <select id="chartType">
-        <option value="histogram" selected>Histogram (distribution of Metric)</option>
-        <option value="grouped_bar">Grouped Bar (average Metric by Category)</option>
-        <option value="binned_bar">Binned Bar (average Metric by binned Numeric)</option>
-      </select>
-    </div>
-
-    <div class="control-group">
-      <label for="xAxis">X-Axis (for Binned Bar):</label>
-      <select id="xAxis">
-        <option value="social_media_hours" selected>Social Media Hours</option>
-        <option value="daily_screen_time_hours">Daily Screen Time</option>
-        <option value="gaming_hours">Gaming Hours</option>
-        <option value="caffeine_intake_mg_per_day">Caffeine Intake (mg)</option>
-        <option value="phone_usage_hours">Phone Usage Hours</option>
-        <option value="sleep_duration_hours">Sleep Duration</option>
-      </select>
-    </div>
-
     <div class="control-group">
       <label for="yAxis">Metric:</label>
       <select id="yAxis">
@@ -128,20 +56,22 @@
     </div>
 
     <div class="control-group">
-      <label for="category">Category (for Grouped Bar):</label>
+      <label for="category">Category:</label>
       <select id="category">
-        <option value="gender">Gender</option>
-        <option value="location_type" selected>Location Type</option>
-      </select>
-    </div>
+        <!-- Original categoricals -->
+        <option value="gender" selected>Gender (Male/Female only)</option>
+        <option value="location_type">Location Type</option>
 
-    <div class="control-group">
-      <label for="binCount">Bins (Histogram/Binned Bar):</label>
-      <select id="binCount">
-        <option value="10">10</option>
-        <option value="15" selected>15</option>
-        <option value="20">20</option>
-        <option value="30">30</option>
+        <!-- Derived / binned categories -->
+        <option value="screen_time_bins">Daily Screen Time (hrs)</option>
+        <option value="social_media_bins">Social Media (hrs/day)</option>
+        <option value="gaming_bins">Gaming (hrs/day)</option>
+        <option value="work_bins">Work-related Use (hrs/day)</option>
+        <option value="sleep_bins">Sleep Duration (hrs)</option>
+        <option value="caffeine_bins">Caffeine Intake (mg/day)</option>
+        <option value="age_group">Age Group</option>
+        <option value="activity_bins">Physical Activity (hrs/week)</option>
+        <option value="dominant_device">Dominant Device</option>
       </select>
     </div>
 
@@ -160,9 +90,9 @@
   let fullData = [];
   let currentData = [];
 
-  const margin = {top: 20, right: 160, bottom: 70, left: 80};
-  const width = 1000 - margin.left - margin.right;
-  const height = 600 - margin.top - margin.bottom;
+  const margin = {top: 20, right: 40, bottom: 70, left: 80};
+  const width = 800 - margin.left - margin.right;
+  const height = 500 - margin.top - margin.bottom;
 
   const svg = d3.select("#viz")
     .attr("width", width + margin.left + margin.right)
@@ -175,119 +105,196 @@
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-  const colorScales = {
-    gender: d3.scaleOrdinal().domain(["Male","Female","Other"]).range(["#3498db","#e74c3c","#9b59b6"]),
-    location_type: d3.scaleOrdinal().domain(["Urban","Suburban","Rural"]).range(["#e67e22","#2ecc71","#1abc9c"])
+  // Base color palettes per category (fallbacks for derived categories)
+  const palettes = {
+    gender: ["#3498db","#e74c3c"],
+    location_type: ["#e67e22","#2ecc71","#1abc9c"],
+    default: ["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f","#edc949","#af7aa1","#ff9da7","#9c755f","#bab0ab"]
   };
 
   function finite(n){ return Number.isFinite(n); }
   function showError(msg) {
     g.selectAll("*").remove();
     g.append("text").attr("x",10).attr("y",20).attr("fill","#e74c3c")
-      .style("font","14px/1.4 sans-serif").text(msg);
+      .style("font","14px sans-serif").text(msg);
   }
   function formatLabel(v){ return {
-    stress_level:"Stress Level (1-10)", caffeine_intake_mg_per_day:"Caffeine Intake (mg/day)",
-    daily_screen_time_hours:"Daily Screen Time (hours)", social_media_hours:"Social Media (hours/day)",
-    gaming_hours:"Gaming (hours/day)", phone_usage_hours:"Phone Usage (hours/day)",
-    sleep_duration_hours:"Sleep Duration (hours)", weekly_anxiety_score:"Weekly Anxiety Score",
+    stress_level:"Stress Level (1-10)", weekly_anxiety_score:"Weekly Anxiety Score",
     mood_rating:"Mood Rating (1-10)", mental_health_score:"Mental Health Score",
-    gender:"Gender", location_type:"Location Type"
+    gender:"Gender", location_type:"Location Type",
+    screen_time_bins:"Daily Screen Time (hrs)", social_media_bins:"Social Media (hrs/day)",
+    gaming_bins:"Gaming (hrs/day)", work_bins:"Work-related Use (hrs/day)",
+    sleep_bins:"Sleep Duration (hrs)", caffeine_bins:"Caffeine Intake (mg/day)",
+    age_group:"Age Group", activity_bins:"Physical Activity (hrs/week)",
+    dominant_device:"Dominant Device"
   }[v]||v; }
 
-  function renderHistogram(rows, metric, binCount){
-    const vals = rows.map(d=>+d[metric]).filter(finite);
-    if(vals.length===0){ showError("No data"); return; }
-    const x = d3.scaleLinear().domain(d3.extent(vals)).range([0,width]).nice();
-    const bins = d3.bin().domain(x.domain()).thresholds(binCount)(vals);
-    const y = d3.scaleLinear().domain([0, d3.max(bins,d=>d.length)]).range([height,0]).nice();
+  // --- Category configuration: how to compute each bucketed/derived category
+  const categoryConfig = {
+    // existing fields (with special handling for gender filtering)
+    gender: { type: "field" },
+    location_type: { type: "field" },
 
-    g.append("g").attr("transform",`translate(0,${height})`).call(d3.axisBottom(x));
+    // binned numeric categories: thresholds define bin edges
+    screen_time_bins: { type: "binned", field: "daily_screen_time_hours", thresholds: [0,2,4,6,8,10,24] },
+    social_media_bins: { type: "binned", field: "social_media_hours", thresholds: [0,1,2,3,4,6,12] },
+    gaming_bins: { type: "binned", field: "gaming_hours", thresholds: [0,1,2,3,4,6,12] },
+    work_bins: { type: "binned", field: "work_related_hours", thresholds: [0,1,2,3,4,6,12] },
+    sleep_bins: { type: "binned", field: "sleep_duration_hours", thresholds: [0,4,5,6,7,8,9,12] },
+    caffeine_bins: { type: "binned", field: "caffeine_intake_mg_per_day", thresholds: [0,50,100,200,300,400,600,2000] },
+    activity_bins: { type: "binned", field: "physical_activity_hours_per_week", thresholds: [0,1,3,5,7,10,20] },
+
+    // age group (custom buckets)
+    age_group: { type: "custom", fn: d => {
+      const a = +d.age;
+      if (!finite(a)) return null;
+      if (a < 18) return "<18";
+      if (a < 25) return "18–24";
+      if (a < 35) return "25–34";
+      if (a < 45) return "35–44";
+      if (a < 55) return "45–54";
+      if (a < 65) return "55–64";
+      return "65+";
+    }},
+
+    // dominant device = argmax of the four device-hour fields
+    dominant_device: { type: "custom", fn: d => {
+      const candidates = [
+        ["Phone", d.phone_usage_hours],
+        ["Laptop", d.laptop_usage_hours],
+        ["Tablet", d.tablet_usage_hours],
+        ["TV", d.tv_usage_hours]
+      ].filter(([_,v]) => finite(+v));
+      if (!candidates.length) return null;
+      candidates.sort((a,b)=>b[1]-a[1]);
+      // handle ties by grouping >= 95% of the max into "Mixed"
+      const max = candidates[0][1];
+      const top = candidates.filter(c => Math.abs(c[1] - max) <= 0.05 * max);
+      return top.length === 1 ? candidates[0][0] : "Mixed";
+    }}
+  };
+
+  function binLabel(thresholds, value){
+    // thresholds like [0,2,4,6,8,10] -> labels "[0–2)", "[2–4)" ... "10+"
+    for (let i=0; i<thresholds.length-1; i++){
+      if (value >= thresholds[i] && value < thresholds[i+1]) {
+        return `${thresholds[i]}–${thresholds[i+1]}`;
+      }
+    }
+    const last = thresholds[thresholds.length-1];
+    if (value >= last) return `${last}+`;
+    return null;
+  }
+
+  function getCategoryValue(d, catKey){
+    const cfg = categoryConfig[catKey];
+    if (!cfg) return null;
+
+    if (cfg.type === "field"){
+      if (catKey === "gender") {
+        // hide "Other"
+        return (d.gender === "Male" || d.gender === "Female") ? d.gender : null;
+      }
+      return d[catKey] || null;
+    }
+
+    if (cfg.type === "binned"){
+      const v = +d[cfg.field];
+      if (!finite(v)) return null;
+      return binLabel(cfg.thresholds, v);
+    }
+
+    if (cfg.type === "custom"){
+      return cfg.fn(d);
+    }
+
+    return null;
+  }
+
+  function renderGroupedBar(rows, catKey, metric){
+    // map each row to { key: category value, metric }
+    const prepared = rows.map(d => ({ key: getCategoryValue(d, catKey), val: +d[metric] }))
+                         .filter(r => r.key != null && finite(r.val));
+
+    if (!prepared.length){ showError("No data for selected category/metric."); return; }
+
+    // average metric by category key
+    const rolled = d3.rollup(prepared, v => d3.mean(v, d => d.val), d => d.key);
+    let data = Array.from(rolled, ([key, val]) => ({ key, val }));
+
+    // For readability, if too many bins, keep top 10 by count/mean? (Optional)
+    // (You can uncomment to cap categories)
+    // if (data.length > 12) { data = data.slice(0, 12); }
+
+    // sort by value descending
+    data.sort((a,b)=>d3.descending(a.val, b.val));
+
+    // color scale (categorical, dynamic domain)
+    const palette = palettes[catKey] || palettes.default;
+    const color = d3.scaleOrdinal().domain(data.map(d=>d.key)).range(palette);
+
+    // scales
+    const x = d3.scaleBand().domain(data.map(d=>d.key)).range([0,width]).padding(0.3);
+    const y = d3.scaleLinear().domain([0, d3.max(data, d=>d.val)]).range([height,0]).nice();
+
+    // draw
+    g.selectAll("*").remove();
+    g.append("g").attr("transform",`translate(0,${height})`).call(d3.axisBottom(x))
+      .selectAll("text").style("font-size","12px");
     g.append("g").call(d3.axisLeft(y));
-    g.append("text").attr("class","axis-label").attr("transform",`translate(${width/2},${height+50})`)
-      .style("text-anchor","middle").text(formatLabel(metric));
-    g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("y",-50).attr("x",-height/2)
-      .style("text-anchor","middle").text("Count");
 
-    g.selectAll(".bar").data(bins).enter().append("rect")
-      .attr("x",d=>x(d.x0)+1).attr("y",d=>y(d.length))
-      .attr("width",d=>Math.max(0,x(d.x1)-x(d.x0)-1)).attr("height",d=>height-y(d.length))
-      .attr("fill","#3498db")
-      .on("mouseover",(e,d)=>tooltip.style("opacity",1).html(`Range: ${d.x0.toFixed(1)}–${d.x1.toFixed(1)}<br/>Count: ${d.length}`)
-        .style("left",(e.offsetX+margin.left+15)+"px").style("top",(e.offsetY+margin.top-10)+"px"))
+    g.append("text").attr("class","axis-label")
+      .attr("transform",`translate(${width/2},${height+50})`)
+      .style("text-anchor","middle").text(formatLabel(catKey));
+
+    g.append("text").attr("class","axis-label")
+      .attr("transform","rotate(-90)")
+      .attr("y",-50).attr("x",-height/2)
+      .style("text-anchor","middle")
+      .text(`Average ${formatLabel(metric)}`);
+
+    g.selectAll(".bar").data(data).enter().append("rect")
+      .attr("x",d=>x(d.key))
+      .attr("y",d=>y(d.val))
+      .attr("width",x.bandwidth())
+      .attr("height",d=>height - y(d.val))
+      .attr("fill",d=>color(d.key))
+      .on("mouseover",(e,d)=>{
+        tooltip.style("opacity",1).html(`<strong>${d.key}</strong><br/>Avg ${formatLabel(metric)}: ${d.val.toFixed(2)}`)
+          .style("left",(e.offsetX+margin.left+15)+"px")
+          .style("top",(e.offsetY+margin.top-10)+"px");
+      })
       .on("mousemove",(e)=>tooltip.style("left",(e.offsetX+margin.left+15)+"px").style("top",(e.offsetY+margin.top-10)+"px"))
       .on("mouseout",()=>tooltip.transition().duration(150).style("opacity",0));
   }
 
-  function renderGroupedBar(rows, cat, metric){
-    const rolled = d3.rollup(rows,v=>d3.mean(v,d=>d[metric]),d=>d[cat]);
-    const data = Array.from(rolled,([key,val])=>({key,val})).filter(d=>d.key && finite(d.val));
-    if(data.length===0){ showError("No data"); return; }
-
-    const x = d3.scaleBand().domain(data.map(d=>d.key)).range([0,width]).padding(0.2);
-    const y = d3.scaleLinear().domain([0,d3.max(data,d=>d.val)]).range([height,0]).nice();
-    const color = colorScales[cat];
-
-    g.append("g").attr("transform",`translate(0,${height})`).call(d3.axisBottom(x));
-    g.append("g").call(d3.axisLeft(y));
-    g.append("text").attr("class","axis-label").attr("transform",`translate(${width/2},${height+50})`)
-      .style("text-anchor","middle").text(formatLabel(cat));
-    g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("y",-50).attr("x",-height/2)
-      .style("text-anchor","middle").text(`Avg ${formatLabel(metric)}`);
-
-    g.selectAll(".bar").data(data).enter().append("rect")
-      .attr("x",d=>x(d.key)).attr("y",d=>y(d.val)).attr("width",x.bandwidth()).attr("height",d=>height-y(d.val))
-      .attr("fill",d=>color(d.key));
-  }
-
-  function renderBinnedBar(rows,xVar,yVar,binCount){
-    const usable = rows.filter(d=>finite(d[xVar])&&finite(d[yVar]));
-    if(!usable.length){ showError("No data"); return; }
-    const x = d3.scaleLinear().domain(d3.extent(usable,d=>d[xVar])).range([0,width]).nice();
-    const bins = d3.bin().domain(x.domain()).thresholds(binCount).value(d=>d[xVar])(usable);
-    const binsWithMean = bins.map(b=>({x0:b.x0,x1:b.x1,mean:d3.mean(b,d=>d[yVar])})).filter(b=>finite(b.mean));
-    const y = d3.scaleLinear().domain([0,d3.max(binsWithMean,d=>d.mean)]).range([height,0]).nice();
-
-    g.append("g").attr("transform",`translate(0,${height})`).call(d3.axisBottom(x));
-    g.append("g").call(d3.axisLeft(y));
-    g.append("text").attr("class","axis-label").attr("transform",`translate(${width/2},${height+50})`)
-      .style("text-anchor","middle").text(formatLabel(xVar)+" (binned)");
-    g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("y",-50).attr("x",-height/2)
-      .style("text-anchor","middle").text(`Avg ${formatLabel(yVar)}`);
-
-    g.selectAll(".bar").data(binsWithMean).enter().append("rect")
-      .attr("x",d=>x(d.x0)+1).attr("y",d=>y(d.mean))
-      .attr("width",d=>Math.max(0,x(d.x1)-x(d.x0)-1)).attr("height",d=>height-y(d.mean))
-      .attr("fill","#3498db");
-  }
-
   function updateVis(){
-    g.selectAll("*").remove();
-    const chart = document.getElementById("chartType").value;
-    const xVar=document.getElementById("xAxis").value;
-    const yVar=document.getElementById("yAxis").value;
-    const cat=document.getElementById("category").value;
-    const bins=+document.getElementById("binCount").value;
-    if(chart==="histogram") renderHistogram(currentData,yVar,bins);
-    if(chart==="grouped_bar") renderGroupedBar(currentData,cat,yVar);
-    if(chart==="binned_bar") renderBinnedBar(currentData,xVar,yVar,bins);
+    const yVar = document.getElementById("yAxis").value;
+    const cat = document.getElementById("category").value;
+    renderGroupedBar(currentData, cat, yVar);
   }
 
   function resetView(){
-    document.getElementById("chartType").value="histogram";
-    document.getElementById("xAxis").value="social_media_hours";
     document.getElementById("yAxis").value="stress_level";
-    document.getElementById("category").value="location_type";
-    document.getElementById("binCount").value="15";
+    document.getElementById("category").value="gender";
     updateVis();
   }
 
   async function loadData(){
-    const num=['user_id','age','daily_screen_time_hours','phone_usage_hours','laptop_usage_hours','tablet_usage_hours','tv_usage_hours','social_media_hours','work_related_hours','entertainment_hours','gaming_hours','sleep_duration_hours','sleep_quality','mood_rating','stress_level','physical_activity_hours_per_week','mental_health_score','caffeine_intake_mg_per_day','weekly_anxiety_score','weekly_depression_score','mindfulness_minutes_per_day'];
-    const data=await d3.csv('Tech_Use_Stress_Wellness.csv',d=>{num.forEach(f=>{if(d[f]!==undefined)d[f]=+d[f];});return d;});
-    fullData=data; currentData=data; updateVis();
+    const numeric = [
+      'user_id','age','daily_screen_time_hours','phone_usage_hours','laptop_usage_hours','tablet_usage_hours','tv_usage_hours',
+      'social_media_hours','work_related_hours','entertainment_hours','gaming_hours','sleep_duration_hours','sleep_quality',
+      'mood_rating','stress_level','physical_activity_hours_per_week','mental_health_score','caffeine_intake_mg_per_day',
+      'weekly_anxiety_score','weekly_depression_score','mindfulness_minutes_per_day'
+    ];
+    const data = await d3.csv('Tech_Use_Stress_Wellness.csv', d => {
+      numeric.forEach(f => { if (d[f] !== undefined) d[f] = +d[f]; });
+      return d;
+    });
+    fullData = data; currentData = data; updateVis();
   }
-  ["chartType","xAxis","yAxis","category","binCount"].forEach(id=>document.getElementById(id).addEventListener("change",updateVis));
+
+  ["yAxis","category"].forEach(id => document.getElementById(id).addEventListener("change", updateVis));
   loadData();
 </script>
 </body>
